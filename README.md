@@ -12,7 +12,7 @@ As a test case, data on rice imports by Mozambique between the years 2000 and 20
 ## Tools
 The volume of trade statistics necessitates use of cloud computing. For this project Azure databricks was used. The code was written in Python (PySpark).
 
-## Analyses
+## Algorithm
 **Extract data**   
 Mozambique rice imports annual data (df) for all partners between 2000-2019.
 
@@ -59,6 +59,61 @@ df = pd.merge(df, SUV, how='left')
 ```
 ![df-after-extraction](https://github.com/HabibRKhan/trade_quantity_estimation/blob/main/df_SUV.PNG)
 
-**Estimate missing netweights as value/SUV, put a flag**   
-**Calulate ratio of available records by period for each partner to total number of periods**   
+**Estimate missing netweights**   
+If netWgt is null, it will be estimated as primaryValue/value (SUV). But before that, create a flag variable which will be 1 if net weight is estimated, 0 otherwise. Next, if qtyUnitCode is -1, force it to 8.
+
+```
+df['flag'] = np.where(df['netWgt'].isnull(), 1, 0)
+df['netWgt_complete'] = np.where(df['netWgt'].isnull(), (df['primaryValue']/df['SUV']), df['netWgt'])
+df['qtyUnitCode'] = pd.to_numeric(df['qtyUnitCode'])
+df['qtyUnitCode_complete'] = np.where((df['qtyUnitCode']==-1), 8, df['qtyUnitCode'])
+```
+
+**Calulate ratio of available records***   
+First create a table with partner, commodity and period; and then count how many periods by that combination are there. 
+
+```
+count_series = df.groupby(['partnerCode', 'commodity_group_code', 'period']).size()
+freq_df = count_series.to_frame(name = 'size').reset_index()
+```
+
+Many partners have multiple records per period. But we're interested in the ratio of number of periods for which records are available to total periods.
+
+```
+freq_df = freq_df.drop(['size'], axis = 1)
+freq_df = freq_df.groupby(['partnerCode', 'commodity_group_code']).size()
+freq_df = freq_df.to_frame(name = 'nperiod').reset_index()
+```
+
+Finally, calculate the ratio by dividing by total number of periods.
+
+```
+n = df['period'].nunique()
+freq_df['share'] = freq_df['nperiod']/n
+```
+![df-after-extraction](https://github.com/HabibRKhan/trade_quantity_estimation/blob/main/Freq.PNG)
+
+Very few partners have records for more than 80% of the periods.
+
+```
+freq_df.hist(column="share", bins=5, grid=False, rwidth=.97)
+```
+![df-after-extraction](https://github.com/HabibRKhan/trade_quantity_estimation/blob/main/Freq_hist.PNG)
+
+But these partners account for majority of values.
+
+```
+group1 = freq_df[freq_df["share"]>=0.8]["partnerCode"]
+group2 = freq_df[freq_df["share"]<0.8]["partnerCode"]
+
+sum1 = df[df["partnerCode"].isin(group1)]["primaryValue"].sum()
+sum2 = df[df["partnerCode"].isin(group2)]["primaryValue"].sum()
+
+pie_df = pd.DataFrame({'partner_group': ["more_than_80%", "less_than_80%"],
+                   'sum_values': [sum1, sum2]})
+
+pie_df.plot(kind='pie', y='sum_values')
+```
+![df-after-extraction](https://github.com/HabibRKhan/trade_quantity_estimation/blob/main/Freq_pie.PNG)
+
 **Calculate new variables for Z score**   
