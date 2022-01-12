@@ -1,6 +1,6 @@
 # Trade quantity estimation
 ## Background
-International Merchandise Trade Statistics often suffer from poor quantity values. One of the main reasons is that recording quantity information is not given the same importance as recording trade values. The main source of trade data is customs. Since taxes and duties are determined based on the values and not the quantities, there's often no incentive of recording them diligently.
+International Merchandise Trade Statistics often suffer from poor quantity values. One of the main reasons is that recording quantity information is not given the same importance as recording trade values. The main source of trade data is customs administration. Since taxes and duties are determined based on the values and not the quantities, there's often no incentive of recording them diligently.
 
 This leaves the statisticians with less than perfect data. Since many analyses require quantities and/or unit values, quantity information is of interest to the statisticians and policy makers.
 
