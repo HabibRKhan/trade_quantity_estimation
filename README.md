@@ -98,7 +98,7 @@ Very few partners have records for more than 80% of the periods.
 ```
 freq_df.hist(column="share", bins=5, grid=False, rwidth=.97)
 ```
-![df-after-extraction](https://github.com/HabibRKhan/trade_quantity_estimation/blob/main/Freq_hist.PNG)
+![df-after-extraction](https://github.com/HabibRKhan/trade_quantity_estimation/blob/main/Freq_hist.png)
 
 But these partners account for majority of values.
 
@@ -114,6 +114,6 @@ pie_df = pd.DataFrame({'partner_group': ["more_than_80%", "less_than_80%"],
 
 pie_df.plot(kind='pie', y='sum_values')
 ```
-![df-after-extraction](https://github.com/HabibRKhan/trade_quantity_estimation/blob/main/Freq_pie.PNG)
+![df-after-extraction](https://github.com/HabibRKhan/trade_quantity_estimation/blob/main/Freq_pie.png)
 
 **Calculate new variables for Z score**   
