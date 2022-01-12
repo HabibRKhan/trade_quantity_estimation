@@ -19,6 +19,8 @@ Mozambique rice imports annual data (df) for all partners between 2000-2019.
 ```
 df = sqlContext.sql("select reporterCode, partnerCode, period, cmdCode, primaryValue, netWgt, qtyUnitCode, altQtyUnitCode, altQty from delta.dtarifflineannual where reporterCode = '508' and flowCode = 'M' and cmdCode like '100630%' and period BETWEEN 2000 AND 2019")
 ```
+![df-after-extraction](https://github.com/HabibRKhan/trade_quantity_estimation/blob/main/df1.PNG)
+
 **Import SUV***   
 In the initial round, outliers are removed using the Statndard Unit Values (SUV) table downloaded from COMTRADE <https://unstats.un.org/unsd/trade/data/tables.asp#SUV>.   
 The table was previously uploaded to databricks Filestore which are then extracted.
@@ -29,6 +31,7 @@ SUV = pd.read_csv("/dbfs/FileStore/tables/TSUV_tabDelimUtf.txt", sep="\t")
 #Subset the SUV table to keep only imports(flow_code=M) of rice(commodity_group_code=100630)
 SUV = SUV[(SUV.trade_flow=="M") & (SUV.commodity_group_code==100630)]
 ```
+![df-after-extraction](https://github.com/HabibRKhan/trade_quantity_estimation/blob/main/SUV.PNG)
 
 **Keep SUVs for only latest HS version**    
 Only necessary columns in SUV are kept and prefix H from commodity classification version is dropped. The version number is then used to sort and remove duplicates keeping only the latest version.
@@ -41,6 +44,7 @@ SUV['commodity_classification'] = SUV['commodity_classification'].str[1:2]
 SUV = SUV.sort_values(by=['year', 'commodity_group_code', 'commodity_classification'])
 SUV = SUV.drop_duplicates(subset = ['year', 'commodity_group_code'], keep = 'last')
 ```
+![df-after-extraction](https://github.com/HabibRKhan/trade_quantity_estimation/blob/main/SUV2.PNG)
 
 **Merge df with SUV**   
 SUV is merged with df by year and commodity code. We need to rename SUV's year column as period and create a column in df with 6-digits commodity codes named as commodity_group_code. This ensures that the two dataframes have two columns each with same titles to merge on. Also, renaming the SUV column from value to SUV to avoid confusion with primaryValue in df
@@ -53,6 +57,7 @@ SUV['commodity_group_code'] = SUV['commodity_group_code'].astype(str)
 df['commodity_group_code'] = df['cmdCode'].str[:6]
 df = pd.merge(df, SUV, how='left')
 ```
+![df-after-extraction](https://github.com/HabibRKhan/trade_quantity_estimation/blob/main/df_SUV.PNG)
 
 **Estimate missing netweights as value/SUV, put a flag**   
 **Calulate ratio of available records by period for each partner to total number of periods**   
