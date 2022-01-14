@@ -207,8 +207,9 @@ df['ABSdifflogQty'] = abs(df['difflogQty'])
 ```
 
 The resulting data at this point looks as below (since there were too many variables, a few screenshots were needed):
-![df-with-z-vars1](df_with_Zvars_1.png)
-![df-with-z-vars2](df_with_Zvars_2.png)
-![df-with-z-vars3](df_with_Zvars_3.png)
-![df-with-z-vars4](df_with_Zvars_4.png)
-![df-with-z-vars5](df_with_Zvars_5.png)
+![freq-value-pie](Freq_pie.png)
+![df-with-z-vars1](df_with_Zvars_1.PNG)
+![df-with-z-vars2](df_with_Zvars_2.PNG)
+![df-with-z-vars3](df_with_Zvars_3.PNG)
+![df-with-z-vars4](df_with_Zvars_4.PNG)
+![df-with-z-vars5](df_with_Zvars_5.PNG)
